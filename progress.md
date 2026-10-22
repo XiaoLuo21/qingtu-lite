@@ -31,6 +31,7 @@
 | 22:43 | TASK-04 | 新增大图素材 heavy.jpg（3600×2600，7.71 MiB 高熵）+ T17 用例 | PASS | 7.7 MiB 压缩成功，输出 4.08 MiB（-44.5%） | 接入测试 |
 | 22:47 | TASK-04 | 排查 T17 首跑超时：Playwright trace 录屏使 Canvas 编码由约 10s 变为 57s | FIXED | 大图用例拆到 `tests/heavy.spec.js` 并关闭 trace | 全量回归 |
 | 22:50 | TASK-04 | 全量 `npx playwright test`（17 条，含大文件） | PASS **17/17**（3.9m） | testing/e2e-final.log、heavy-compression.json | 打包交付 |
+| 22:52 | TASK-10 | 重新构建并打包静态成品 `qingtu-lite-dist.zip`（17 KB，解压即站点） | PASS | qingtu-lite-deliverables/qingtu-lite-dist.zip；zip 与 dist 校验一致 | 等外部凭据 |
 
 ## 版本记录（只记录真实发生的修改）
 

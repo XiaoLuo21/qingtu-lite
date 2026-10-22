@@ -22,6 +22,11 @@
 | 22:25 | TASK-05 | 再次检查 `gh auth status` / `env | grep -i github` / `~/.config/gh` | BLOCKED | gh 不存在、无 token、无配置文件 | 标记 `PUBLISH_BLOCKED_AUTH`，交付本地可运行版本与工作流 |
 | 22:24–22:27 | TASK-09/10 | 复制 AGENTS.md、TASK_EXECUTION_PLAN.md；`git init` + 5 次真实提交 | PASS | `git log`：feat / test / ci / docs / test config | 写交付文档 |
 | 22:28 | TASK-10 | 编写 progress.md、README.md 完成；整理私有交付目录 | DOING | qingtu-lite-deliverables/ | 最终报告与作业草案 |
+| 22:29 | TASK-10 | 干净重装复现：`npm ci`（7s，0 漏洞）+ `npm run build` + `npm test` | PASS | testing/npm-ci.log、build.log、unit-test.log；13/13 | 补测 |
+| 22:30 | TASK-04 | 新增 T15（5000×600 超长边缩放至 4096 并提示）与 T16（换图立即清除旧结果） | PASS | 单跑 2/2（43.2s） | 全量回归 |
+| 22:31 | TASK-04 | 全量 `npx playwright test`（干净安装后） | PASS **16/16**（3.1m） | testing/e2e-final.log | 子路径验证 |
+| 22:31 | TASK-05 预备 | 将 `dist/` 部署到模拟子路径 `/qingtu-lite/` 并用浏览器实测 | PASS | testing/pages-subpath-check.json：资源 0 失败、压缩下载正常、无 pageerror | 文档 |
+| 22:32–22:35 | TASK-09/10 | 交付 FINAL_REPORT、作业待填写内容、AI 协作记录、用户测试 CSV/邀请文案、视频信息与失败记录 | DONE | qingtu-lite-deliverables/ | 收尾提交 |
 
 ## 版本记录（只记录真实发生的修改）
 
@@ -29,7 +34,7 @@
 |---|---|---|---|
 | V1 | 内部测试首轮 | 完成上传、校验、压缩、预览、真实体积对比、下载的可用 MVP（首轮 e2e 14 项中 12 项通过） | 首轮 e2e 输出：T06/T07 失败，原因是空状态下下载按钮未禁用 |
 | V2 | 内部测试 T06/T07 失败 | 下载按钮初始 `disabled`；`init()` 调用 `clearResult()` 清理初始态；输出 MIME 校验与失败文案已在 V1 内实现 | 21.3s 回归 T06/T07 通过（2 passed） |
-| V3 | 全量回归 + 生产构建检查 | 375/390px 移动端验证、键盘操作验证、生产 `preview` 下截图与下载验证；README 与交付文档 | 全量 14 passed；capture.mjs 结果：0 溢出、0 外部请求 |
+| V3 | 全量回归 + 生产构建检查 | 375/390px 移动端验证、键盘操作验证、生产 `preview` 下截图与下载验证；补充 4096px 缩放与换图清理用例；README 与交付文档 | 全量 **16 passed**；子路径模拟 0 失败请求；capture.mjs：0 溢出、0 外部请求 |
 
 > 说明：V1/V2 的界面与最终版视觉一致（差异仅在按钮初始状态），因此首个可用版本没有单独留存页面截图；V1 的问题以首轮 e2e 终端输出为证据，不补拍、不伪造时间。
 

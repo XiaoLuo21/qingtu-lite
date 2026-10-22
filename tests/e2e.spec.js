@@ -9,6 +9,7 @@ const FIXTURES = {
   png: fx("transparent.png"),
   webp: fx("sample.webp"),
   tiny: fx("tiny.png"),
+  wide: fx("wide.png"),
   corrupt: fx("corrupt.jpg"),
   text: fx("not-image.txt"),
   big: fx("big.jpg"),
@@ -364,4 +365,41 @@ test("T14 aria 与隐私说明存在，且不被静态资源错误打断", async
   await expect(page.locator("#quality-range")).toHaveAttribute("min", "40");
   await expect(page.locator("body")).toContainText("不会上传服务器");
   await expect(page.locator('a[href*="compressorjs"]')).toHaveAttribute("rel", "noopener noreferrer");
+});
+
+test("T15 最长边超过 4096px 时缩放并在结果中说明", async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.goto("/");
+  await upload(page, FIXTURES.wide);
+  await expect(page.locator("#original-dims")).toHaveText("5000 × 600");
+
+  await compress(page);
+  await expect(page.locator("#result-note")).toContainText("已缩放至 4096");
+  await expect(page.locator("#result-type-label")).toContainText("4096 ×");
+
+  const { buffer } = await downloadResult(page);
+  const base64 = buffer.toString("base64");
+  const decodedWidth = await page.evaluate(async (data) => {
+    const response = await fetch(`data:image/webp;base64,${data}`);
+    const bitmap = await createImageBitmap(await response.blob());
+    const width = bitmap.width;
+    if (typeof bitmap.close === "function") bitmap.close();
+    return width;
+  }, base64);
+  expect(decodedWidth).toBe(4096);
+  expect(errors, errors.join("\n")).toEqual([]);
+});
+
+test("T16 选择新图片后立即清除上一张的结果", async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.goto("/");
+  await upload(page, FIXTURES.jpeg);
+  await compress(page);
+  await expect(page.locator("#result-section")).toBeVisible();
+
+  await page.setInputFiles("#file-input", FIXTURES.png);
+  await expect(page.locator("#original-name")).toHaveText("transparent.png");
+  await expect(page.locator("#result-section")).toBeHidden();
+  await expect(page.locator("#download-button")).toBeDisabled();
+  expect(errors, errors.join("\n")).toEqual([]);
 });

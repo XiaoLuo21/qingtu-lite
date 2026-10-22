@@ -169,3 +169,72 @@ test("源码不得包含上传或追踪调用（隐私回归测试）", () => {
     assert.doesNotMatch(sources, pattern, `不应出现 ${pattern}`);
   }
 });
+
+test("validateFileMeta：15 MiB 边界与空文件", () => {
+  assert.deepEqual(validateFileMeta({ name: "ok.jpg", size: MAX_BYTES, type: "image/jpeg" }), { ok: true });
+  const over = validateFileMeta({ name: "big.jpg", size: MAX_BYTES + 1, type: "image/jpeg" });
+  assert.equal(over.ok, false);
+  assert.equal(over.code, "SIZE");
+  assert.match(over.message, /超过 15 MiB 上限/);
+
+  const empty = validateFileMeta({ name: "empty.jpg", size: 0, type: "image/jpeg" });
+  assert.equal(empty.ok, false);
+  assert.equal(empty.code, "EMPTY");
+
+  const unknown = validateFileMeta({ name: "empty.jpg", size: Number.NaN, type: "image/jpeg" });
+  assert.equal(unknown.code, "EMPTY");
+
+  const wrongType = validateFileMeta({ name: "a.gif", size: 1024, type: "image/gif" });
+  assert.equal(wrongType.code, "TYPE");
+});
+
+test("computeDelta：输出为零、变大与基本不变", () => {
+  assert.deepEqual(computeDelta(1000, 0), { ratio: 100, text: "体积减少 100.0%", kind: "down" });
+  const bigger = computeDelta(1000, 1500);
+  assert.equal(bigger.kind, "up");
+  assert.equal(bigger.text, "体积增加 50.0%");
+  const flat = computeDelta(100000, 99960);
+  assert.equal(flat.kind, "flat");
+  assert.equal(flat.text, "体积基本不变");
+  assert.equal(computeDelta(0, 10).text, "—");
+  assert.equal(computeDelta(1000, Number.NaN).text, "—");
+});
+
+test("sanitizeStem：中文、路径符与非法字符", () => {
+  assert.equal(sanitizeStem("报告 v2.1（最终）.png"), "报告 v2.1（最终）");
+  assert.equal(sanitizeStem("../../etc/passwd"), "etc-passwd");
+  assert.equal(sanitizeStem("a/b\\c:d*e?.jpg"), "a-b-c-d-e");
+  assert.equal(sanitizeStem(".."), "image");
+  assert.equal(sanitizeStem(""), "image");
+  assert.equal(sanitizeStem(undefined), "image");
+  assert.equal(sanitizeStem("x".repeat(100)).length, 60);
+});
+
+test("buildDownloadName 与 MIME 一致性守卫", () => {
+  assert.equal(buildDownloadName("photo.png", "image/webp"), "photo-qingtu.webp");
+  assert.equal(buildDownloadName("photo.png", "image/jpeg"), "photo-qingtu.jpg");
+  assert.equal(buildDownloadName("photo.webp", "image/png"), "photo-qingtu.png");
+  assert.equal(buildDownloadName("photo.webp", "image/gif"), "");
+
+  assert.equal(isDownloadNameConsistent("photo-qingtu.webp", "image/webp"), true);
+  assert.equal(isDownloadNameConsistent("photo-qingtu.jpg", "image/webp"), false);
+  assert.equal(isDownloadNameConsistent("", "image/webp"), false);
+});
+
+test("normalizeQuality：范围内取整、越界收敛与回退", () => {
+  assert.equal(normalizeQuality("70"), 70);
+  assert.equal(normalizeQuality("42"), 40);
+  assert.equal(normalizeQuality("43"), 45);
+  assert.equal(normalizeQuality("88"), 90);
+  assert.equal(normalizeQuality("95"), 90);
+  assert.equal(normalizeQuality("10"), 40);
+  assert.equal(normalizeQuality("abc"), 70);
+  assert.equal(normalizeQuality(undefined, 60), 60);
+});
+
+test("wasDownscaled 同时检查宽高，缺失数据不误报", () => {
+  assert.equal(wasDownscaled({ width: 5000, height: 600 }, { width: 4096, height: 491 }), true);
+  assert.equal(wasDownscaled({ width: 100, height: 900 }, { width: 100, height: 800 }), true);
+  assert.equal(wasDownscaled({ width: 100, height: 100 }, { width: 100, height: 100 }), false);
+  assert.equal(wasDownscaled(null, { width: 1, height: 1 }), false);
+});

@@ -32,6 +32,8 @@
 | 22:47 | TASK-04 | 排查 T17 首跑超时：Playwright trace 录屏使 Canvas 编码由约 10s 变为 57s | FIXED | 大图用例拆到 `tests/heavy.spec.js` 并关闭 trace | 全量回归 |
 | 22:50 | TASK-04 | 全量 `npx playwright test`（17 条，含大文件） | PASS **17/17**（3.9m） | testing/e2e-final.log、heavy-compression.json | 打包交付 |
 | 22:52 | TASK-10 | 重新构建并打包静态成品 `qingtu-lite-dist.zip`（17 KB，解压即站点） | PASS | qingtu-lite-deliverables/qingtu-lite-dist.zip；zip 与 dist 校验一致 | 等外部凭据 |
+| 22:56 | TASK-04 | 第 3 轮：补 6 组边界单测（15 MiB 边界、零输出、路径注入文件名、质量归一化） | PASS **19/19** | tests/unit.test.js | 阻塞复核 |
+| 22:57 | TASK-05/09 | 第 3 轮复核 gh/token/凭据与 DOCX 模板 | BLOCKED | 连续 3 轮均无凭据、无模板 | 标记目标受阻 |
 
 ## 版本记录（只记录真实发生的修改）
 

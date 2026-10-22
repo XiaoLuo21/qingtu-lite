@@ -14,6 +14,7 @@ const FIXTURE_FILES = {
   text: "not-image.txt",
   big: "big.jpg",
   wide: "wide.png",
+  heavy: "heavy.jpg",
 };
 
 function dataUrlToBuffer(dataUrl) {
@@ -125,6 +126,19 @@ async function drawAssets() {
       wideCtx.font = "bold 180px sans-serif";
       wideCtx.fillText("5000 x 600", 180, 340);
 
+      // 接近 15 MiB 上限的高熵 JPG：验证大文件仍能成功压缩且不报错。
+      const heavyCanvas = makeCanvas(3600, 2600);
+      const heavyCtx = heavyCanvas.getContext("2d");
+      const heavyImage = heavyCtx.createImageData(3600, 2600);
+      for (let index = 0; index < heavyImage.data.length; index += 4) {
+        heavyImage.data[index] = (index * 7) % 256;
+        heavyImage.data[index + 1] = (index * 13) % 256;
+        heavyImage.data[index + 2] = (index * 29) % 256;
+        heavyImage.data[index + 3] = 255;
+      }
+      heavyCtx.putImageData(heavyImage, 0, 0);
+      const heavyData = heavyCanvas.toDataURL("image/jpeg", 0.95);
+
       // 1x1 透明 PNG，用于观察“体积变大”文案。
       const tinyCanvas = makeCanvas(1, 1);
       tinyCanvas.getContext("2d").clearRect(0, 0, 1, 1);
@@ -135,6 +149,7 @@ async function drawAssets() {
         webp: webpCanvas.toDataURL("image/webp", 0.9),
         tiny: tinyCanvas.toDataURL("image/png"),
         wide: wideCanvas.toDataURL("image/png"),
+        heavy: heavyData,
       };
     });
     return {
@@ -143,6 +158,7 @@ async function drawAssets() {
       webp: dataUrlToBuffer(assets.webp),
       tiny: dataUrlToBuffer(assets.tiny),
       wide: dataUrlToBuffer(assets.wide),
+      heavy: dataUrlToBuffer(assets.heavy),
     };
   } finally {
     await browser.close();
@@ -176,6 +192,7 @@ export async function generateFixtures({ force = false } = {}) {
   await writeFile(path.join(fixtureDir, FIXTURE_FILES.webp), assets.webp);
   await writeFile(path.join(fixtureDir, FIXTURE_FILES.tiny), assets.tiny);
   await writeFile(path.join(fixtureDir, FIXTURE_FILES.wide), assets.wide);
+  await writeFile(path.join(fixtureDir, FIXTURE_FILES.heavy), assets.heavy);
   await writeFile(path.join(fixtureDir, FIXTURE_FILES.corrupt), assets.jpeg.subarray(0, 600));
   await writeFile(
     path.join(fixtureDir, FIXTURE_FILES.text),

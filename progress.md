@@ -27,6 +27,10 @@
 | 22:31 | TASK-04 | 全量 `npx playwright test`（干净安装后） | PASS **16/16**（3.1m） | testing/e2e-final.log | 子路径验证 |
 | 22:31 | TASK-05 预备 | 将 `dist/` 部署到模拟子路径 `/qingtu-lite/` 并用浏览器实测 | PASS | testing/pages-subpath-check.json：资源 0 失败、压缩下载正常、无 pageerror | 文档 |
 | 22:32–22:35 | TASK-09/10 | 交付 FINAL_REPORT、作业待填写内容、AI 协作记录、用户测试 CSV/邀请文案、视频信息与失败记录 | DONE | qingtu-lite-deliverables/ | 收尾提交 |
+| 22:40 | TASK-05/09 | 第 2 轮复核：gh/token/gh 配置、全盘 DOCX 模板搜索 | BLOCKED | 仍无 gh、无 token、无模板（find 全盘 0 命中） | 维持 PUBLISH_BLOCKED_AUTH / DOCX_BLOCKED |
+| 22:43 | TASK-04 | 新增大图素材 heavy.jpg（3600×2600，7.71 MiB 高熵）+ T17 用例 | PASS | 7.7 MiB 压缩成功，输出 4.08 MiB（-44.5%） | 接入测试 |
+| 22:47 | TASK-04 | 排查 T17 首跑超时：Playwright trace 录屏使 Canvas 编码由约 10s 变为 57s | FIXED | 大图用例拆到 `tests/heavy.spec.js` 并关闭 trace | 全量回归 |
+| 22:50 | TASK-04 | 全量 `npx playwright test`（17 条，含大文件） | PASS **17/17**（3.9m） | testing/e2e-final.log、heavy-compression.json | 打包交付 |
 
 ## 版本记录（只记录真实发生的修改）
 

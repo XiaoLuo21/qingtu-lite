@@ -10,6 +10,7 @@ const FIXTURES = {
   webp: fx("sample.webp"),
   tiny: fx("tiny.png"),
   wide: fx("wide.png"),
+  heavy: fx("heavy.jpg"),
   corrupt: fx("corrupt.jpg"),
   text: fx("not-image.txt"),
   big: fx("big.jpg"),

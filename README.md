@@ -35,10 +35,10 @@ npm run preview # 预览生产构建 http://127.0.0.1:4173
 ```bash
 npm test            # 13 个 Node 单元测试（纯函数与静态隐私扫描）
 npm run fixtures    # 用本机 Chrome 生成测试图片到 tests/fixtures/
-npm run test:e2e    # Playwright 端到端测试（16 条）
+npm run test:e2e    # Playwright 端到端测试（17 条，含大文件用例）
 ```
 
-端到端覆盖：JPG/PNG/WebP 压缩、透明背景处理、WebP 不支持时降级 JPEG、画质 40%/90% 对比、非图片 / 超大 / 损坏文件拒绝、快速换图、体积增大文案、最长边超过 4096px 的缩放、换图后清除旧结果、375px 与 1440px 布局、键盘操作、输出 MIME 不一致的失败路径、aria 与隐私文案。
+端到端覆盖：JPG/PNG/WebP 压缩、透明背景处理、WebP 不支持时降级 JPEG、画质 40%/90% 对比、非图片 / 超大 / 损坏文件拒绝、快速换图、体积增大文案、最长边超过 4096px 的缩放、换图后清除旧结果、7.7 MiB 大图压缩、375px 与 1440px 布局、键盘操作、输出 MIME 不一致的失败路径、aria 与隐私文案。
 
 > 测试夹具由脚本在本地生成，不含任何个人照片；`tests/fixtures/` 已被 `.gitignore` 排除。
 

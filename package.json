@@ -1,0 +1,22 @@
+{
+  "name": "qingtu-lite",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "轻图 Lite — 不上传服务器的浏览器内图片压缩工具",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/unit.test.js",
+    "test:e2e": "playwright test",
+    "fixtures": "node tests/generate-fixtures.mjs"
+  },
+  "dependencies": {
+    "compressorjs": "^1.4.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "vite": "^8.3.5"
+  }
+}

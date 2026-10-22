@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.*
+*.log
+.playwright/
+playwright-report/
+test-results/
+blob-report/
+tests/fixtures/
+qingtu-lite-deliverables/
+.DS_Store

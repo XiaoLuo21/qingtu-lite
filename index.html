@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6f9f7" />
+    <meta
+      name="description"
+      content="轻图 Lite：在浏览器本地压缩 JPG、PNG、WebP 图片，对比真实体积并下载，图片不会上传服务器。"
+    />
+    <title>轻图 Lite｜浏览器内图片压缩</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b9474'/%3E%3Cpath d='M20 38l10-14 8 10 6-7 4 11z' fill='%23fff'/%3E%3Ccircle cx='24' cy='23' r='4' fill='%23d9f2e9'/%3E%3C/svg%3E"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#workbench">跳到压缩工作台</a>
+
+    <header class="site-header">
+      <div class="wrap header-inner">
+        <a class="brand" href="./" aria-label="轻图 Lite 首页">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" width="22" height="22" fill="none">
+              <path d="M6 22l6-8 5 6 3.5-4L26 22H6z" fill="currentColor" />
+              <circle cx="11" cy="10" r="2.4" fill="currentColor" />
+            </svg>
+          </span>
+          <span class="brand-text">
+            <strong>轻图 Lite</strong>
+            <small>Qingtu Lite</small>
+          </span>
+        </a>
+        <p class="header-note">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          图片只在本地浏览器处理，不会上传服务器
+        </p>
+      </div>
+    </header>
+
+    <section class="hero wrap" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">浏览器内压缩 · 无需登录 · 免费</p>
+        <h1 id="hero-title">把图片体积<br /><em>轻</em>下来</h1>
+        <p class="lead">
+          选择一张 JPG、PNG 或 WebP，调整画质后在本地完成压缩，查看真实的前后大小并下载。全程不经过服务器。
+        </p>
+        <ul class="hero-badges">
+          <li>WebP 优先</li>
+          <li>最长边 4096px</li>
+          <li>单张 ≤ 15 MiB</li>
+        </ul>
+      </div>
+      <aside class="hero-steps" aria-labelledby="steps-title">
+        <h2 id="steps-title">三步完成</h2>
+        <ol>
+          <li>
+            <span class="step-index" aria-hidden="true">01</span>
+            <div>
+              <strong>选择图片</strong>
+              <p>点击或拖拽上传，支持 JPG / PNG / WebP。</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-index" aria-hidden="true">02</span>
+            <div>
+              <strong>调整画质</strong>
+              <p>在 40%–90% 之间调节，默认 70%。</p>
+            </div>
+          </li>
+          <li>
+            <span class="step-index" aria-hidden="true">03</span>
+            <div>
+              <strong>对比并下载</strong>
+              <p>查看真实体积变化，下载可再次打开的图片。</p>
+            </div>
+          </li>
+        </ol>
+      </aside>
+    </section>
+
+    <main id="workbench" class="wrap workbench">
+      <section class="card upload-card" aria-labelledby="upload-title">
+        <div class="card-head">
+          <h2 id="upload-title"><span aria-hidden="true">1.</span> 选择原图</h2>
+          <span class="card-tag">本地读取</span>
+        </div>
+
+        <div
+          id="drop-zone"
+          class="drop-zone"
+          role="button"
+          tabindex="0"
+          aria-label="上传图片：点击选择或拖拽文件到这里"
+          aria-describedby="drop-hint"
+        >
+          <input
+            id="file-input"
+            class="visually-hidden"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            aria-label="选择图片文件"
+          />
+          <span class="drop-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 16V4m0 0L7 9m5-5l5 5" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M4 15v3.5A1.5 1.5 0 005.5 20h13a1.5 1.5 0 001.5-1.5V15" stroke-linecap="round" />
+            </svg>
+          </span>
+          <p class="drop-title">拖拽图片到这里，或点击选择</p>
+          <p id="drop-hint" class="drop-hint">支持 JPG、PNG、WebP，单张不超过 15 MiB。</p>
+        </div>
+
+        <figure id="original-panel" class="original-panel" hidden>
+          <div class="thumb-frame">
+            <img id="original-preview" alt="原图预览" />
+          </div>
+          <figcaption class="file-meta">
+            <span id="original-name" class="file-name">—</span>
+            <span class="file-facts">
+              <span id="original-size">—</span>
+              <span aria-hidden="true">·</span>
+              <span id="original-dims">—</span>
+              <span aria-hidden="true">·</span>
+              <span id="original-format">—</span>
+            </span>
+          </figcaption>
+        </figure>
+
+        <p class="privacy-note">
+          <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7">
+            <path d="M10 2l6 2.4v4.7c0 4-2.5 6.7-6 8.4-3.5-1.7-6-4.4-6-8.4V4.4L10 2z" />
+            <path d="M7.5 9.8l1.8 1.8 3.3-3.6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          图片仅在当前浏览器内存中处理，不会上传到任何服务器。
+        </p>
+      </section>
+
+      <section class="card control-card" aria-labelledby="control-title">
+        <div class="card-head">
+          <h2 id="control-title"><span aria-hidden="true">2.</span> 调整并压缩</h2>
+          <span class="card-tag">WebP 优先</span>
+        </div>
+
+        <div class="quality-block">
+          <div class="quality-head">
+            <label for="quality-range">输出画质</label>
+            <output id="quality-value" for="quality-range">70%</output>
+          </div>
+          <input
+            id="quality-range"
+            class="range"
+            type="range"
+            min="40"
+            max="90"
+            step="5"
+            value="70"
+            aria-describedby="quality-hint"
+          />
+          <div class="range-scale" aria-hidden="true">
+            <span>40%</span>
+            <span>70%</span>
+            <span>90%</span>
+          </div>
+          <p id="quality-hint" class="hint">
+            画质越低体积通常越小；画质与格式转换都会影响最终结果，以实际输出为准。
+          </p>
+        </div>
+
+        <dl class="fixed-facts">
+          <div>
+            <dt>输出格式</dt>
+            <dd id="output-format-fact">WebP（不支持时自动用 JPEG）</dd>
+          </div>
+          <div>
+            <dt>最长边</dt>
+            <dd>超过 4096px 自动缩放</dd>
+          </div>
+        </dl>
+
+        <p id="webp-support-note" class="compat-note" hidden></p>
+
+        <button id="compress-button" class="btn btn-primary btn-block" type="button" disabled>
+          开始压缩
+        </button>
+        <p id="status-message" class="status" role="status" aria-live="polite">
+          还没有选择图片，先上传一张吧。
+        </p>
+      </section>
+    </main>
+
+    <section id="result-section" class="wrap result" aria-labelledby="result-title" hidden>
+      <div class="card result-card">
+        <div class="result-head">
+          <div>
+            <h2 id="result-title">压缩结果</h2>
+            <p id="result-note" class="result-note"></p>
+          </div>
+          <span id="result-format" class="format-chip">—</span>
+        </div>
+
+        <div class="compare-grid">
+          <figure class="compare-item">
+            <div class="compare-frame">
+              <img id="compare-original" alt="原图预览" />
+            </div>
+            <figcaption>
+              <span class="compare-label">原图</span>
+              <strong id="compare-original-size">—</strong>
+              <span id="compare-original-type" class="muted">—</span>
+            </figcaption>
+          </figure>
+          <figure class="compare-item is-result">
+            <div class="compare-frame">
+              <img id="result-preview" alt="压缩后的图片预览" />
+            </div>
+            <figcaption>
+              <span class="compare-label">压缩后</span>
+              <strong id="result-size">—</strong>
+              <span id="result-type-label" class="muted">—</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <dl class="metrics">
+          <div>
+            <dt>原始大小</dt>
+            <dd id="metric-original">—</dd>
+          </div>
+          <div>
+            <dt>输出大小</dt>
+            <dd id="metric-result">—</dd>
+          </div>
+          <div>
+            <dt>体积变化</dt>
+            <dd id="metric-delta" class="delta">—</dd>
+          </div>
+        </dl>
+
+        <div class="result-actions">
+          <button id="download-button" class="btn btn-primary" type="button" disabled>
+            下载压缩结果
+          </button>
+          <button id="reset-button" class="btn btn-ghost" type="button">换一张图片</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="wrap features" aria-labelledby="features-title">
+      <h2 id="features-title">为什么用轻图 Lite</h2>
+      <div class="feature-grid">
+        <article>
+          <span class="feature-icon" aria-hidden="true">◎</span>
+          <h3>不上传，更安心</h3>
+          <p>压缩在浏览器内存中完成，没有上传接口，也没有账号与追踪脚本。</p>
+        </article>
+        <article>
+          <span class="feature-icon" aria-hidden="true">◈</span>
+          <h3>格式与大小透明</h3>
+          <p>按真实输出字节数计算变化率，结果变大时也会直接告诉你。</p>
+        </article>
+        <article>
+          <span class="feature-icon" aria-hidden="true">◐</span>
+          <h3>画质自己把握</h3>
+          <p>40%–90% 五档步进，调整后可反复压缩对比，直到满意再下载。</p>
+        </article>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <p class="footer-main">轻图 Lite · 本地处理，不上传服务器。</p>
+        <p class="muted">
+          压缩效果取决于浏览器、图片内容与格式，不同图片结果差异较大。本工具不承诺固定压缩率。
+        </p>
+        <p class="muted">
+          压缩内核
+          <a href="https://github.com/fengyuanchen/compressorjs" target="_blank" rel="noopener noreferrer"
+            >Compressor.js</a
+          >（MIT License，作者 Fengyuan Chen）。
+        </p>
+      </div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

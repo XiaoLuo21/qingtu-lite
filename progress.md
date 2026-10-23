@@ -66,3 +66,9 @@
 - 时间（北京时间）：2026-10-23 10:33 后｜动作：用户要求输出格式使用 JPG。原冻结口径为 WebP 优先，用户本人指令覆盖之。
 - 变更：新增输出格式选择（JPG / WebP），默认 JPG；选 WebP 且浏览器支持编码时输出 WebP，不支持时禁用 WebP 选项并用 JPG；lib 新增 resolveOutputMime 并补单测；e2e 同步更新（默认 JPG 断言、选 WebP 保留透明、heavy 改 JPG）。
 - 执行者：Athena（经纽约机仓库提交推送）。
+
+## 2026-10-23 前端重新设计（用户指令）
+- 时间（北京时间）：2026-10-23 10:49 后｜动作：用户要求重新设计前端，取向 Apple × Anthropic 风格，并指定可用 Figma 设计。
+- 设计稿：Figma「轻图 Lite · Redesign（Apple × Anthropic）」（Desktop 1440 / Mobile 390 / Design Tokens 三个画板）。
+- 落地：style.css 整体重写为暖象牙底色（#F7F4EF）+ 衬线展示字体 + 黏土色主色（#D97757）+ 发丝线卡片 + 胶囊按钮；功能、DOM ID、文案契约不变；favicon 与 theme-color 同步换色。
+- 执行者：Athena。

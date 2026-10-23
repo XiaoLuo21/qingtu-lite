@@ -17,8 +17,8 @@ function parseBytes(text) {
   return value;
 }
 
-function isWebpBuffer(buffer) {
-  return buffer.subarray(0, 4).toString("ascii") === "RIFF" && buffer.subarray(8, 12).toString("ascii") === "WEBP";
+function isJpegBuffer(buffer) {
+  return buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
 }
 
 test("T17 接近上限的大图（7.7 MiB）可成功压缩且下载可解码", async ({ page }, testInfo) => {
@@ -55,12 +55,12 @@ test("T17 接近上限的大图（7.7 MiB）可成功压缩且下载可解码", 
     page.waitForEvent("download"),
     page.locator("#download-button").click(),
   ]);
-  expect(download.suggestedFilename()).toBe("heavy-qingtu.webp");
+  expect(download.suggestedFilename()).toBe("heavy-qingtu.jpg");
   const buffer = await readFile(await download.path());
-  expect(isWebpBuffer(buffer)).toBe(true);
+  expect(isJpegBuffer(buffer)).toBe(true);
 
   const decodable = await page.evaluate(async (data) => {
-    const response = await fetch(`data:image/webp;base64,${data}`);
+    const response = await fetch(`data:image/jpeg;base64,${data}`);
     const bitmap = await createImageBitmap(await response.blob());
     const ok = bitmap.width > 0 && bitmap.height > 0;
     if (typeof bitmap.close === "function") bitmap.close();

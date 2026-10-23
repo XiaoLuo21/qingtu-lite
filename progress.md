@@ -61,3 +61,8 @@
 3. WebP 能力用 1×1 Canvas `toDataURL('image/webp')` 前缀检测；不支持时 JPEG 兜底，`beforeDraw` 全画布填白。
 4. 用 `requestId` 令牌防止快速换图时旧异步任务回写新状态。
 5. 无 `fetch`/XHR/FormData/analytics，单元测试静态扫描守护；文件名一律 `textContent` 渲染。
+
+## 2026-10-23 输出格式可选（用户指令）
+- 时间（北京时间）：2026-10-23 10:33 后｜动作：用户要求输出格式使用 JPG。原冻结口径为 WebP 优先，用户本人指令覆盖之。
+- 变更：新增输出格式选择（JPG / WebP），默认 JPG；选 WebP 且浏览器支持编码时输出 WebP，不支持时禁用 WebP 选项并用 JPG；lib 新增 resolveOutputMime 并补单测；e2e 同步更新（默认 JPG 断言、选 WebP 保留透明、heavy 改 JPG）。
+- 执行者：Athena（经纽约机仓库提交推送）。

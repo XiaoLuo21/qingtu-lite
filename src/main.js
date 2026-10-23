@@ -10,6 +10,7 @@ import {
   isDownloadNameConsistent,
   isWebpDataUrl,
   normalizeQuality,
+  resolveOutputMime,
   typeLabel,
   validateFileMeta,
   wasDownscaled,
@@ -26,10 +27,10 @@ const els = {
   originalFormat: document.querySelector("#original-format"),
   qualityRange: document.querySelector("#quality-range"),
   qualityValue: document.querySelector("#quality-value"),
+  formatSelect: document.querySelector("#format-select"),
   compressButton: document.querySelector("#compress-button"),
   status: document.querySelector("#status-message"),
   webpNote: document.querySelector("#webp-support-note"),
-  outputFormatFact: document.querySelector("#output-format-fact"),
   resultSection: document.querySelector("#result-section"),
   resultNote: document.querySelector("#result-note"),
   resultFormat: document.querySelector("#result-format"),
@@ -95,6 +96,11 @@ function updateQualityUI() {
   const max = Number(els.qualityRange.max);
   const fill = max > min ? ((value - min) / (max - min)) * 100 : 60;
   els.qualityRange.style.setProperty("--fill", `${fill}%`);
+}
+
+/** 当前选择的输出格式对应的实际目标 MIME（选 WebP 但浏览器不支持时降级 JPG）。 */
+function selectedTargetMime() {
+  return resolveOutputMime(els.formatSelect.value, state.webpSupported);
 }
 
 /** 用浏览器真实解码能力获取尺寸，损坏文件会抛错。 */
@@ -251,7 +257,7 @@ async function selectFile(file) {
 
   els.compressButton.disabled = false;
   setCompressLabel("开始压缩");
-  const target = state.webpSupported ? "WebP" : "JPEG";
+  const target = typeLabel(selectedTargetMime());
   setStatus(`已选择「${file.name}」，点击“开始压缩”生成 ${target} 结果。`, "info");
 }
 
@@ -295,7 +301,7 @@ async function compress() {
   clearResult();
   setStatus("正在浏览器本地压缩，请稍候…", "busy");
 
-  const targetMime = state.webpSupported ? "image/webp" : "image/jpeg";
+  const targetMime = selectedTargetMime();
   const quality = normalizeQuality(els.qualityRange.value) / 100;
 
   try {
@@ -442,6 +448,7 @@ function resetAll() {
   clearSelection();
   els.fileInput.value = "";
   els.qualityRange.value = "70";
+  els.formatSelect.value = "image/jpeg";
   updateQualityUI();
   setStatus("已清空当前图片，重新上传一张开始吧。", "info");
   els.dropZone.focus();
@@ -504,6 +511,17 @@ function bindEvents() {
     }
   });
 
+  els.formatSelect.addEventListener("change", () => {
+    if (state.compressing) return;
+    if (state.result) {
+      setCompressLabel("重新压缩");
+      setStatus("输出格式已调整，点击“重新压缩”获取新的结果。", "info");
+    } else if (state.file) {
+      const target = typeLabel(selectedTargetMime());
+      setStatus(`输出格式已调整为 ${target}，点击“开始压缩”生成结果。`, "info");
+    }
+  });
+
   els.compressButton.addEventListener("click", compress);
   els.downloadButton.addEventListener("click", downloadResult);
   els.resetButton.addEventListener("click", resetAll);
@@ -519,10 +537,12 @@ function bindEvents() {
 function init() {
   state.webpSupported = detectWebpSupport();
   if (!state.webpSupported) {
+    const webpOption = els.formatSelect.querySelector('option[value="image/webp"]');
+    if (webpOption) webpOption.disabled = true;
+    els.formatSelect.value = "image/jpeg";
     els.webpNote.hidden = false;
     els.webpNote.textContent =
-      "当前浏览器不支持 WebP 编码，将改用 JPEG 输出；PNG 等透明图片的透明区域会被填充为白色。";
-    els.outputFormatFact.textContent = "JPEG（当前浏览器不支持 WebP）";
+      "当前浏览器不支持 WebP 编码，WebP 选项已禁用，将使用 JPG 输出；PNG 等透明图片的透明区域会被填充为白色。";
   }
 
   updateQualityUI();

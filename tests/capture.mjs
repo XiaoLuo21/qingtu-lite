@@ -83,9 +83,7 @@ const downloaded = await readFile(downloadPath);
 summary.checks.download = {
   name: download.suggestedFilename(),
   bytes: (await stat(downloadPath)).size,
-  webpMagic:
-    downloaded.subarray(0, 4).toString("ascii") === "RIFF" &&
-    downloaded.subarray(8, 12).toString("ascii") === "WEBP",
+  jpegMagic: downloaded[0] === 0xff && downloaded[1] === 0xd8 && downloaded[2] === 0xff,
 };
 
 // 低画质重压缩

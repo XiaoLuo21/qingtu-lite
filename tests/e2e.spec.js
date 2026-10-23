@@ -36,6 +36,11 @@ async function compress(page) {
   await expect(page.locator("#download-button")).toBeEnabled();
 }
 
+async function selectFormat(page, mime) {
+  await page.selectOption("#format-select", mime);
+  await expect(page.locator("#format-select")).toHaveValue(mime);
+}
+
 async function setQuality(page, value) {
   await page.locator("#quality-range").evaluate((element, next) => {
     element.value = String(next);
@@ -107,7 +112,7 @@ async function assertDecodable(page, buffer, mime) {
   expect(decodable).toBe(true);
 }
 
-test("T01 JPG 压缩：WebP 输出、真实体积、可解码下载且无外部请求", async ({ page }) => {
+test("T01 JPG 压缩：默认 JPG 输出、真实体积、可解码下载且无外部请求", async ({ page }) => {
   const errors = trackErrors(page);
   const externalRequests = [];
   page.on("request", (request) => {
@@ -126,25 +131,43 @@ test("T01 JPG 压缩：WebP 输出、真实体积、可解码下载且无外部�
   await expect(page.locator("#original-format")).toHaveText("JPG");
 
   await compress(page);
-  await expect(page.locator("#result-format")).toHaveText("WebP");
+  await expect(page.locator("#result-format")).toHaveText("JPG");
   await expect(page.locator("#result-type-label")).toContainText("1600 × 1000");
-  await expect(page.locator("#result-note")).toContainText("原始 JPG → 输出 WebP");
+  await expect(page.locator("#result-note")).toContainText("原始 JPG → 输出 JPG");
   await expectHonestDelta(page);
 
   const { name, buffer } = await downloadResult(page);
-  expect(name).toBe("sample-qingtu.webp");
-  expect(isWebpBuffer(buffer)).toBe(true);
-  await assertDecodable(page, buffer, "image/webp");
+  expect(name).toBe("sample-qingtu.jpg");
+  expect(isJpegBuffer(buffer)).toBe(true);
+  await assertDecodable(page, buffer, "image/jpeg");
 
   expect(externalRequests).toEqual([]);
   expect(errors, errors.join("\n")).toEqual([]);
 });
 
-test("T02 透明 PNG 压缩为 WebP 并保留透明背景", async ({ page }) => {
+test("T02 透明 PNG 默认 JPG 输出，透明区域填白并给出提示", async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto("/");
   await upload(page, FIXTURES.png);
   await expect(page.locator("#original-format")).toHaveText("PNG");
+  await compress(page);
+
+  await expect(page.locator("#result-format")).toHaveText("JPG");
+  await expect(page.locator("#result-note")).toContainText("填充为白色");
+
+  const { name, buffer } = await downloadResult(page);
+  expect(name).toBe("transparent-qingtu.jpg");
+  expect(isJpegBuffer(buffer)).toBe(true);
+  await assertDecodable(page, buffer, "image/jpeg");
+  expect(errors, errors.join("\n")).toEqual([]);
+});
+
+test("T02a 透明 PNG 选择 WebP 输出并保留透明背景", async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.goto("/");
+  await upload(page, FIXTURES.png);
+  await expect(page.locator("#original-format")).toHaveText("PNG");
+  await selectFormat(page, "image/webp");
   await compress(page);
 
   await expect(page.locator("#result-format")).toHaveText("WebP");
@@ -158,7 +181,7 @@ test("T02 透明 PNG 压缩为 WebP 并保留透明背景", async ({ page }) => 
   expect(errors, errors.join("\n")).toEqual([]);
 });
 
-test("T02b 浏览器不支持 WebP 时降级 JPEG，透明区域填白并给出提示", async ({ page }) => {
+test("T02b 浏览器不支持 WebP 时禁用 WebP 选项，JPG 输出填白并给出提示", async ({ page }) => {
   const errors = trackErrors(page);
   await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.toDataURL;
@@ -169,7 +192,9 @@ test("T02b 浏览器不支持 WebP 时降级 JPEG，透明区域填白并给出�
   });
   await page.goto("/");
   await expect(page.locator("#webp-support-note")).toBeVisible();
-  await expect(page.locator("#webp-support-note")).toContainText("JPEG");
+  await expect(page.locator("#webp-support-note")).toContainText("JPG");
+  await expect(page.locator('#format-select option[value="image/webp"]')).toBeDisabled();
+  await expect(page.locator("#format-select")).toHaveValue("image/jpeg");
 
   await upload(page, FIXTURES.png);
   await compress(page);
@@ -183,11 +208,12 @@ test("T02b 浏览器不支持 WebP 时降级 JPEG，透明区域填白并给出�
   expect(errors, errors.join("\n")).toEqual([]);
 });
 
-test("T03 WebP 输入：正常压缩、格式与扩展名一致", async ({ page }) => {
+test("T03 WebP 输入并选择 WebP 输出：正常压缩、格式与扩展名一致", async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto("/");
   await upload(page, FIXTURES.webp);
   await expect(page.locator("#original-format")).toHaveText("WebP");
+  await selectFormat(page, "image/webp");
   await compress(page);
   await expect(page.locator("#result-format")).toHaveText("WebP");
   await expect(page.locator("#result-note")).toContainText("原始 WebP → 输出 WebP");
@@ -267,7 +293,7 @@ test("T08 快速切换两张图片，结果始终对应当前图片", async ({ p
   await compress(page);
   await expect(page.locator("#result-type-label")).toContainText("900 × 700");
   const { name } = await downloadResult(page);
-  expect(name).toBe("transparent-qingtu.webp");
+  expect(name).toBe("transparent-qingtu.jpg");
   expect(errors, errors.join("\n")).toEqual([]);
 });
 
@@ -336,7 +362,7 @@ test("T11 键盘可完成上传、压缩与下载", async ({ page }) => {
     page.waitForEvent("download"),
     page.keyboard.press("Enter"),
   ]);
-  expect(download.suggestedFilename()).toBe("sample-qingtu.webp");
+  expect(download.suggestedFilename()).toBe("sample-qingtu.jpg");
   expect(errors, errors.join("\n")).toEqual([]);
 });
 
@@ -381,7 +407,7 @@ test("T15 最长边超过 4096px 时缩放并在结果中说明", async ({ page 
   const { buffer } = await downloadResult(page);
   const base64 = buffer.toString("base64");
   const decodedWidth = await page.evaluate(async (data) => {
-    const response = await fetch(`data:image/webp;base64,${data}`);
+    const response = await fetch(`data:image/jpeg;base64,${data}`);
     const bitmap = await createImageBitmap(await response.blob());
     const width = bitmap.width;
     if (typeof bitmap.close === "function") bitmap.close();

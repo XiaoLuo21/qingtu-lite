@@ -46,7 +46,7 @@
           选择一张 JPG、PNG 或 WebP，调整画质后在本地完成压缩，查看真实的前后大小并下载。全程不经过服务器。
         </p>
         <ul class="hero-badges">
-          <li>WebP 优先</li>
+          <li>JPG / WebP 可选</li>
           <li>最长边 4096px</li>
           <li>单张 ≤ 15 MiB</li>
         </ul>
@@ -139,7 +139,7 @@
       <section class="card control-card" aria-labelledby="control-title">
         <div class="card-head">
           <h2 id="control-title"><span aria-hidden="true">2.</span> 调整并压缩</h2>
-          <span class="card-tag">WebP 优先</span>
+          <span class="card-tag">JPG / WebP 可选</span>
         </div>
 
         <div class="quality-block">
@@ -167,11 +167,20 @@
           </p>
         </div>
 
-        <dl class="fixed-facts">
-          <div>
-            <dt>输出格式</dt>
-            <dd id="output-format-fact">WebP（不支持时自动用 JPEG）</dd>
+        <div class="format-block">
+          <div class="quality-head">
+            <label for="format-select">输出格式</label>
           </div>
+          <select id="format-select" class="select" aria-describedby="format-hint">
+            <option value="image/jpeg" selected>JPG（兼容性最好）</option>
+            <option value="image/webp">WebP（体积通常更小）</option>
+          </select>
+          <p id="format-hint" class="hint">
+            默认 JPG；选择 WebP 时若浏览器不支持编码会自动改用 JPG。透明图片输出 JPG 时，透明区域会填充为白色。
+          </p>
+        </div>
+
+        <dl class="fixed-facts">
           <div>
             <dt>最长边</dt>
             <dd>超过 4096px 自动缩放</dd>

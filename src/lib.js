@@ -122,6 +122,15 @@ export function isWebpDataUrl(dataUrl) {
   return typeof dataUrl === "string" && dataUrl.startsWith("data:image/webp");
 }
 
+/**
+ * 把用户选择的输出格式解析为实际目标 MIME。
+ * 只有明确选择 WebP 且浏览器支持 WebP 编码时才输出 WebP，其余情况一律 JPG。
+ */
+export function resolveOutputMime(requestedMime, webpSupported) {
+  if (requestedMime === "image/webp" && webpSupported) return "image/webp";
+  return "image/jpeg";
+}
+
 /** 把滑块的字符串值规范成 40–90 之间、步进 5 的整数。 */
 export function normalizeQuality(value, fallback = 70) {
   const parsed = Number(value);

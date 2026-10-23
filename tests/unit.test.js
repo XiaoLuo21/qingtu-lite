@@ -11,6 +11,7 @@ import {
   isDownloadNameConsistent,
   isWebpDataUrl,
   normalizeQuality,
+  resolveOutputMime,
   sanitizeStem,
   typeLabel,
   validateFileMeta,
@@ -108,6 +109,15 @@ test("isWebpDataUrl 只认真实前缀", () => {
   assert.equal(isWebpDataUrl("data:image/webp;base64,AAAA"), true);
   assert.equal(isWebpDataUrl("data:image/png;base64,AAAA"), false);
   assert.equal(isWebpDataUrl(undefined), false);
+});
+
+test("resolveOutputMime 默认 JPG，仅在明确选择且支持时输出 WebP", () => {
+  assert.equal(resolveOutputMime("image/jpeg", true), "image/jpeg");
+  assert.equal(resolveOutputMime("image/jpeg", false), "image/jpeg");
+  assert.equal(resolveOutputMime("image/webp", true), "image/webp");
+  assert.equal(resolveOutputMime("image/webp", false), "image/jpeg");
+  assert.equal(resolveOutputMime("image/png", true), "image/jpeg");
+  assert.equal(resolveOutputMime(undefined, true), "image/jpeg");
 });
 
 test("normalizeQuality 规范到 40–90 步进 5", () => {

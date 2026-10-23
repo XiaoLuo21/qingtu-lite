@@ -4,7 +4,7 @@
 
 轻图 Lite 是一个纯前端的一次性图片压缩小工具：选择或拖入一张 JPG / PNG / WebP 图片，在本地浏览器中完成压缩，查看压缩前后真实字节数，然后下载结果。没有账号、没有后端、不上传图片、没有统计脚本。
 
-- 在线地址：**待验证**（GitHub Pages 工作流已就绪；本机无 GitHub 凭据，发布状态见 `progress.md` 中的 `PUBLISH_BLOCKED_AUTH`）
+- 在线地址：https://xiaoluo21.github.io/qingtu-lite/（GitHub Pages 已上线）
 - 产品定位：课程 HW08「B 路径：网页 MVP」
 - 版本：1.0.0
 
